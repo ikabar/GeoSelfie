@@ -17,9 +17,11 @@ import com.ikabar.geoselfie.dummy.DummyContent;
 public class SelfieActivity extends AppCompatActivity implements SelfieFragment.OnListFragmentInteractionListener{
 
     private static final String TAG = MainActivity.class.getSimpleName();
-    private static final int REQUEST_IMAGE_CAPTURE = 0;
+
     private static final int MY_PERMISSIONS_REQUEST_CAMERA = 0;
     private static final int MY_PERMISSIONS_REQUEST_BLUETOOTH = 1;
+    public static final int REQUEST_TAKE_PHOTO = 1;
+    public static final int REQUEST_IMAGE_CAPTURE = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,28 +50,14 @@ public class SelfieActivity extends AppCompatActivity implements SelfieFragment.
     }
 
     private void takePhoto(){
-        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
-            startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
-        }
+        SelfieFragment fragment = (SelfieFragment) getSupportFragmentManager().findFragmentByTag("fragment_selfie");
+        fragment.dispatchTakePictureIntent();
+//        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+//        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+//            startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
+//        }
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        switch (requestCode){
-            case REQUEST_IMAGE_CAPTURE:
-                if(resultCode==RESULT_OK){
-
-                    //TODO: get current distance from beacons
-                    Bundle extras = data.getExtras();
-                    Bitmap imageBitmap = (Bitmap) extras.get("data");
-                    SelfieFragment fragment = (SelfieFragment) getSupportFragmentManager().findFragmentByTag("fragment_selfie");
-                    fragment.addImage(imageBitmap);
-                }
-                break;
-        }
-    }
 
 //    private void requestCameraPermission(){
 //        if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.CAMERA)) {

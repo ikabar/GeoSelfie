@@ -9,11 +9,13 @@ import java.util.Collection;
  */
 public class GeoImage {
 
+    private String title;
     private Bitmap thumbnail;
     private String photoPath;
     Collection<BeaconData> beaconData;
 
-    public GeoImage(Bitmap thumbnail, String photoPath, Collection<BeaconData> beaconData) {
+    public GeoImage(String title, Bitmap thumbnail, String photoPath, Collection<BeaconData> beaconData) {
+        this.title = title;
         this.thumbnail = thumbnail;
         this.photoPath = photoPath;
         this.beaconData = beaconData;
@@ -29,5 +31,9 @@ public class GeoImage {
 
     public Collection<BeaconData> getBeaconData() {
         return beaconData;
+    }
+
+    public String getTitle() {
+        return title;
     }
 }
