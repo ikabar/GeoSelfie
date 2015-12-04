@@ -3,12 +3,15 @@ package com.ikabar.geoselfie;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.AsyncTaskLoader;
+import android.support.v4.content.Loader;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -17,8 +20,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.ikabar.geoselfie.dummy.DummyContent;
-import com.ikabar.geoselfie.dummy.DummyContent.DummyItem;
+import com.ikabar.geoselfie.data.GeoImage;
 
 import java.io.File;
 import java.io.IOException;
@@ -33,7 +35,7 @@ import java.util.List;
  * Activities containing this fragment MUST implement the {@link OnListFragmentInteractionListener}
  * interface.
  */
-public class SelfieFragment extends Fragment {
+public class SelfieFragment extends Fragment implements LoaderManager.LoaderCallbacks<List<GeoImage>> {
 
     // TODO: Customize parameter argument names
     private static final String ARG_COLUMN_COUNT = "column-count";
@@ -42,7 +44,7 @@ public class SelfieFragment extends Fragment {
     // TODO: Customize parameters
     private int mColumnCount = 2;
     private OnListFragmentInteractionListener mListener;
-    private List<GeoImage> images;
+    private List<GeoImage> geoImages;
     private MySelfieRecyclerViewAdapter selfieRecyclerViewAdapter;
     private String mCurrentPhotoPath;
 
@@ -66,24 +68,31 @@ public class SelfieFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        images = new ArrayList<>();
         if (getArguments() != null) {
             mColumnCount = getArguments().getInt(ARG_COLUMN_COUNT);
         }
+        geoImages = new ArrayList<>(0);
     }
 
-//    public void addImage(Bitmap image){
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        getLoaderManager().initLoader(0, null, this).forceLoad();
+    }
+
+    //    public void addImage(Bitmap image){
 //        GeoImage geoImage = new GeoImage(image, mCurrentPhotoPath, null);
-//        images.add(geoImage);
+//        geoImages.add(geoImage);
 ////        selfieRecyclerViewAdapter.notifyDataSetChanged();
-//        selfieRecyclerViewAdapter.notifyItemInserted(images.size()-1);
+//        selfieRecyclerViewAdapter.notifyItemInserted(geoImages.size()-1);
 //    }
 
     public void addImage(){
-        GeoImage geoImage = new GeoImage("SomeString", null, mCurrentPhotoPath, null);
-        images.add(geoImage);
+        GeoImage geoImage = new GeoImage("SomeString", mCurrentPhotoPath, null);
+        geoImage.save();
+        geoImages.add(geoImage);
 //        selfieRecyclerViewAdapter.notifyDataSetChanged();
-        selfieRecyclerViewAdapter.notifyItemInserted(images.size()-1);
+        selfieRecyclerViewAdapter.notifyItemInserted(geoImages.size()-1);
     }
 
 
@@ -155,7 +164,7 @@ public class SelfieFragment extends Fragment {
             } else {
                 recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
             }
-            selfieRecyclerViewAdapter = new MySelfieRecyclerViewAdapter(images, mListener);
+            selfieRecyclerViewAdapter = new MySelfieRecyclerViewAdapter(geoImages, mListener);
 
             recyclerView.setAdapter(selfieRecyclerViewAdapter);
         }
@@ -178,6 +187,32 @@ public class SelfieFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
         mListener = null;
+    }
+
+    @Override
+    public Loader onCreateLoader(int id, Bundle args) {
+        Log.d(TAG, "onCreateLoader");
+        return new AsyncTaskLoader(getActivity()) {
+            @Override
+            public Object loadInBackground() {
+                Log.d(TAG, "Loading geo images in background");
+                return GeoImage.listAll(GeoImage.class);
+            }
+        };
+    }
+
+    @Override
+    public void onLoadFinished(Loader<List<GeoImage>> loader, List<GeoImage> data) {
+        Log.d(TAG, "onLoadFinished");
+        geoImages.addAll(data);
+        selfieRecyclerViewAdapter.notifyDataSetChanged();
+    }
+
+
+    @Override
+    public void onLoaderReset(Loader loader) {
+        Log.d(TAG, "onLoaderReset");
+        geoImages.clear();
     }
 
     /**

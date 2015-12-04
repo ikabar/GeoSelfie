@@ -11,6 +11,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.ikabar.geoselfie.SelfieFragment.OnListFragmentInteractionListener;
+import com.ikabar.geoselfie.data.GeoImage;
 import com.ikabar.geoselfie.dummy.DummyContent.DummyItem;
 
 import java.util.List;
@@ -29,7 +30,6 @@ public class MySelfieRecyclerViewAdapter extends RecyclerView.Adapter<MySelfieRe
         mValues = items;
         mListener = listener;
     }
-
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {

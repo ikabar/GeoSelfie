@@ -1,28 +1,26 @@
-package com.ikabar.geoselfie;
+package com.ikabar.geoselfie.data;
 
-import android.graphics.Bitmap;
+
+import com.ikabar.geoselfie.BeaconData;
+import com.orm.SugarRecord;
 
 import java.util.Collection;
 
 /**
  * Created by ikabar on 25/11/2015.
  */
-public class GeoImage {
+public class GeoImage extends SugarRecord<GeoImage>{
 
     private String title;
-    private Bitmap thumbnail;
     private String photoPath;
     Collection<BeaconData> beaconData;
 
-    public GeoImage(String title, Bitmap thumbnail, String photoPath, Collection<BeaconData> beaconData) {
+    public GeoImage(){};//Used for SugarRecord
+
+    public GeoImage(String title, String photoPath, Collection<BeaconData> beaconData) {
         this.title = title;
-        this.thumbnail = thumbnail;
         this.photoPath = photoPath;
         this.beaconData = beaconData;
-    }
-
-    public Bitmap getThumbnail() {
-        return thumbnail;
     }
 
     public String getPhotoPath() {
